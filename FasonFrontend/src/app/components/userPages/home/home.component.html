@@ -1,0 +1,110 @@
+<div class="dashboard-page">
+	<section class="hero-panel mb-3">
+		<div class="hero-content">
+			<div>
+				<p class="hero-kicker mb-1">Canli Operasyon Ozeti</p>
+				<h2 class="hero-title mb-2">Fason Dashboard</h2>
+				<p class="hero-subtitle mb-0">Aylik ve haftalik skorlar ile trendlerinizi tek ekranda takip edin.</p>
+			</div>
+			<img src="assets/fasonlogo.PNG" alt="Fason Logo" class="hero-logo" />
+		</div>
+	</section>
+
+	<section class="filter-panel mb-3">
+		<div class="d-flex flex-wrap align-items-center gap-2">
+			<span class="filter-label">Kapsam:</span>
+			<span class="text-muted">{{ scopeLabel }}</span>
+			<span class="text-muted ms-auto" *ngIf="lastUpdated">Son guncelleme: {{ lastUpdated | date:'dd.MM.yyyy HH:mm' }}</span>
+		</div>
+	</section>
+
+	<div class="alert alert-danger" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+	<section class="kpi-grid mb-3" *ngIf="!loading">
+		<article class="kpi-card kpi-teal">
+			<div class="kpi-label">Aylik Uretim</div>
+			<div class="kpi-value">{{ kpis.monthlyProduced | number:'1.0-0' }}</div>
+		</article>
+		<article class="kpi-card kpi-orange">
+			<div class="kpi-label">Aylik Hakedis</div>
+			<div class="kpi-value">{{ kpis.monthlyHakedis | number:'1.0-0' }} TL</div>
+		</article>
+		<article class="kpi-card kpi-indigo">
+			<div class="kpi-label">Haftalik Uretim</div>
+			<div class="kpi-value">{{ kpis.weeklyProduced | number:'1.0-0' }}</div>
+		</article>
+		<article class="kpi-card kpi-emerald">
+			<div class="kpi-label">Haftalik Hakedis</div>
+			<div class="kpi-value">{{ kpis.weeklyHakedis | number:'1.0-0' }} TL</div>
+		</article>
+	</section>
+
+	<section class="charts-grid mb-3" *ngIf="!loading">
+		<article class="chart-card">
+			<div class="chart-header">Son 6 Ay Trend</div>
+			<div class="chart-wrap">
+				<canvas
+					baseChart
+					[data]="monthlyTrendData"
+					[options]="lineChartOptions"
+					[type]="'line'">
+				</canvas>
+			</div>
+		</article>
+		<article class="chart-card">
+			<div class="chart-header">Son 4 Hafta Trend</div>
+			<div class="chart-wrap">
+				<canvas
+					baseChart
+					[data]="weeklyTrendData"
+					[options]="barChartOptions"
+					[type]="'bar'">
+				</canvas>
+			</div>
+		</article>
+	</section>
+
+	<section class="insight-grid" *ngIf="!loading">
+		<article class="insight-card">
+			<div class="insight-title">Top Urun Gruplari</div>
+			<div class="insight-list" *ngIf="topProducts.length > 0; else noTopProducts">
+				<div class="insight-row" *ngFor="let p of topProducts">
+					<div class="insight-name">{{ p.name }}</div>
+					<div class="insight-meta">{{ p.quantity | number:'1.0-0' }} ({{ p.ratio | number:'1.0-1' }}%)</div>
+				</div>
+			</div>
+			<ng-template #noTopProducts>
+				<div class="text-muted">Urun verisi bulunamadi.</div>
+			</ng-template>
+		</article>
+
+		<article class="insight-card">
+			<div class="insight-title">Son Hareketler</div>
+			<div class="table-responsive">
+				<table class="table table-sm align-middle mb-0">
+					<thead>
+						<tr>
+							<th>Tarih</th>
+							<th>Urun Grup</th>
+							<th class="text-end">Uretim</th>
+							<th class="text-end">Hakedis</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let r of recentMovements">
+							<td>{{ r.Tarih | date:'dd.MM.yyyy' }}</td>
+							<td>{{ r.URUNGRUPADI || '-' }}</td>
+							<td class="text-end">{{ r.ToplamUretilenMiktar | number:'1.0-0' }}</td>
+							<td class="text-end">{{ r.ToplamHakedis | number:'1.0-0' }}</td>
+						</tr>
+						<tr *ngIf="recentMovements.length === 0">
+							<td colspan="4" class="text-center text-muted">Kayit bulunamadi.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</article>
+	</section>
+
+	<div class="loading-box" *ngIf="loading">Dashboard verileri yukleniyor...</div>
+</div>

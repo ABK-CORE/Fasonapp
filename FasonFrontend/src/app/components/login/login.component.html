@@ -1,0 +1,23 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center p-3">
+  <div class="w-100" style="max-width: 420px;">
+    <div class="bg-white rounded-3 shadow p-4">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <img src="/assets/logo.svg" width="32" height="32" />
+        <h4 class="m-0">Giriş</h4>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="mb-3">
+          <label class="form-label">Kullanıcı Adı</label>
+          <input class="form-control" formControlName="username" autocomplete="username">
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Şifre</label>
+          <input class="form-control" type="password" formControlName="password" autocomplete="current-password">
+        </div>
+        <button class="btn btn-primary w-100" [disabled]="busy">
+          {{ busy ? 'Giriş yapılıyor…' : 'Giriş yap' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

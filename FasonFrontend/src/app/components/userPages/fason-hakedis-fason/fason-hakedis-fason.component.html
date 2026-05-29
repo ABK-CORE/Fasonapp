@@ -1,0 +1,64 @@
+<div class="p-2" style="background:#e3f6fd">
+  <div class="mb-2 fw-bold">Fason Hakediş Fason
+    <ng-container *ngIf="showControls">
+      <label class="ms-3 mb-0">Fason İsim:</label>
+      <select class="form-select form-select-sm w-auto ms-2" [(ngModel)]="selectedFason">
+        <option *ngFor="let f of fasonFirmalar" [value]="f">{{ f }}</option>
+      </select>
+  <button class="btn btn-primary btn-sm ms-2" (click)="goster()">Göster</button>
+  <button class="btn btn-success btn-sm ms-2" (click)="excelExport()">Excel</button>
+    </ng-container>
+  </div>
+  <table *ngIf="dashboardData.length > 0" class="table table-bordered table-sm mt-3">
+    <thead>
+      <tr>
+        <th>Fason İsim</th>
+        <th>Ocak</th>
+        <th>Şubat</th>
+        <th>Mart</th>
+        <th>Nisan</th>
+        <th>Mayıs</th>
+        <th>Haziran</th>
+        <th>Temmuz</th>
+        <th>Ağustos</th>
+        <th>Eylül</th>
+  <th>Ekim 1-15</th>
+  <th>Ekim 16-Son</th>
+  <th>Ekim</th>
+  <th>Kasım 1-15</th>
+  <th>Kasım 16-Son</th>
+  <th>Kasım</th>
+  <th>Aralık 1-15</th>
+  <th>Aralık 16-Son</th>
+  <th>Aralık</th>
+        <th>Yıl Toplam</th>
+        <th>Yıl Toplam Hakediş</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of dashboardData">
+        <td>{{row.Fasonisim}}</td>
+  <td>{{row.Ocak_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Subat_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Mart_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Nisan_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Mayis_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Haziran_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Temmuz_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Agustos_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Eylul_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Ekim_1_15_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Ekim_16_Son_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Ekim_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Kasim_1_15_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Kasim_16_Son_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Kasim_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Aralik_1_15_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Aralik_16_Son_Hakedis | number:'1.2-2'}}</td>
+  <td>{{row.Aralik_Hakedis | number:'1.2-2'}}</td>
+        <td>{{row.YilToplam_Miktar | number:'1.2-2'}}</td>
+        <td>{{row.YilToplam_Hakedis | number:'1.2-2'}} </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

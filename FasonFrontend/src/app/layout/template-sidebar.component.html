@@ -1,0 +1,19 @@
+<div class="d-flex">
+  <aside class="border-end p-3 bg-white" style="min-width:240px">
+    <div class="fw-semibold mb-2">Menü</div>
+    <a routerLink="/dashboard" class="d-block mb-2">🏠 Dashboard</a>
+    <a routerLink="/fason-hakedis-urun-miktarli" class="d-block mb-2" *ngIf="auth.isAuthenticated()">📦 Fason Hakediş Ürün Miktarlı</a>
+  <a routerLink="/fason-hakedis" class="d-block mb-2" *ngIf="auth.isAuthenticated()">💰 Fason Hakediş Fiyatlı</a>
+  <a routerLink="/fason-hakedis-kolili" class="d-block mb-2" *ngIf="auth.isAuthenticated()">📦 Fason Hakediş Detay</a>
+  <a routerLink="/fason-hakedis-fason" class="d-block mb-2" *ngIf="auth.isAuthenticated() && auth.currentUser?.CompanyName === 'BalmyUretim'">📦 Fason Hakediş Fason</a>
+  <a routerLink="/fason-hakedis-fason-fiyatli" class="d-block mb-2" *ngIf="auth.isAuthenticated() && auth.currentUser?.CompanyName === 'BalmyUretim'">💲 Fason Hakediş Fason Fiyatlı</a>
+  <a routerLink="/fason-hakedis-fiyatlari" class="d-block mb-2" *ngIf="auth.isAuthenticated() && auth.currentUser?.CompanyName === 'BalmyUretim'">💰 Fason Hakediş Fiyatları</a>
+  <a routerLink="/fason-ozet" class="d-block mb-2" *ngIf="auth.isAuthenticated()">🧵 Fason Rapor Tarih Bazlı</a>
+  <a routerLink="/fason-aylik-hareketler" class="d-block mb-2" *ngIf="auth.isAuthenticated()">🧾 Fason Aylık Hareketler</a>
+  <a routerLink="/fason-islem" class="d-block mb-2" *ngIf="auth.isAuthenticated()">🛠️ Fason İşlem</a>
+  <a routerLink="/fason-mutabak" class="d-block mb-2" *ngIf="auth.isAuthenticated() && auth.currentUser?.CompanyName === 'BalmyUretim'">📄 Fason Mutabak</a>
+  </aside>
+  <main class="flex-fill p-3">
+    <router-outlet></router-outlet>
+  </main>
+</div>

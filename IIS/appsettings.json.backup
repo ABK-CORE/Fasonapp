@@ -1,0 +1,42 @@
+{
+  "TokenOptions": {
+    "Audience": "https://exampledomain.com",
+    "Issuer": "https://exampledomain.com",
+    "AccessTokenExpiration": 1140
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "DatabaseConnection": "4vsT2JA+hBiPNP/igIFrdL6y+O4XMC5QSOut5cITAEYjbphGqJm0IzO3ROcRTWSMCYIo7g96Wnz1XJFzmmJXcHfsjDvL/vBMOLS9qglYxdOVPgnbtuXsauor66PuMejfGvEpDKmVygCYaF1BVr5V3XoYiFI9c/NNWWDwzo2DkaworN7x3YU0ZK69dSdqpWw937YgfvRtpfE0CCH1GwV34Q==",
+    "HangfireConnection": "Server=10.41.17.2\\WINWIN_SQL;Initial Catalog=Hangfire;Persist Security Info=True;User ID=sa;Password=SI&wrErItoVe;Encrypt=True;TrustServerCertificate=True;"
+  },
+  "JwtSettings": {
+    "SecurityKey": "8N4P2U1wTlKfbSAfkrSzM7q6Wjfjbj4oLJNCDUOCpr0BFIHgtTJq4iBblDyvzZyibYGYoJ/uFVAvbfegLJMt7SiKcgPO7WQOHyfPa+71bHlXSqG+xhwFMVsPFcIqhS1x"
+  },
+  "AesSettings": {
+    "Key": "seXWRTqvXyO+0iLMdaQHKHMNgct2UjXehUPzoS8I8Hg=",
+    "Vektor": "NSFpnL9GP0lqwjmk7j1PrQ=="
+  },
+  "ProjectSettings": {
+    "ProjectName": "Balmy",
+    "ProjectVersion": "1.0.0"
+  },
+  "CorsOrigins": [
+    "http://localhost:4200",
+    "http://po.abkcore.com",
+    "https://po.abkcore.com"
+  ],
+  "AllowedHosts": "*",
+  "EmailSettings": {
+    "SmtpHost": "smtp.office365.com",
+    "SmtpPort": 587,
+    "SmtpUser": "info@abkcore.com",
+    "SmtpPass": "Bahadir1977.",
+    "FromEmail": "info@abkcore.com",
+    "FromName": "ABK Core Destek"
+  }
+}

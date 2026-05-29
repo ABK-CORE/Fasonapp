@@ -1,0 +1,220 @@
+<div *ngIf="accessDenied" class="container mt-4">
+  <div class="alert alert-danger">Yetkiniz yoktur.</div>
+</div>
+<div *ngIf="!accessDenied" class="container mt-4" style="max-width:700px;">
+  <div class="mb-4 d-flex flex-wrap gap-2">
+  <button class="btn btn-outline-primary" [class.active]="activeTab==='lot'" (click)="activeTab='lot'">Lot Oluştur</button>
+  <button class="btn btn-outline-secondary" [class.active]="activeTab==='surec'" (click)="activeTab='surec'">Süreç Değiştir</button>
+  <button class="btn btn-outline-danger" [class.active]="activeTab==='sil'" (click)="activeTab='sil'">Lot Sil</button>
+  <button class="btn btn-outline-warning" [class.active]="activeTab==='tarih'" (click)="activeTab='tarih'">Lotun Tarihini Değiştir</button>
+  <button class="btn btn-outline-success" [class.active]="activeTab==='miktar'" (click)="activeTab='miktar'">Lot Miktarı Güncelle</button>
+  <button class="btn btn-outline-info" [class.active]="activeTab==='bosfason'" (click)="activeTab='bosfason'">Boş Fasonhakediş</button>
+    <div *ngIf="activeTab==='bosfason'">
+      <h5 class="mb-3">Boş Fasonhakediş</h5>
+      <form [formGroup]="bosFasonForm" (ngSubmit)="getBosFasonHakedis()" class="bg-white p-4 rounded shadow-sm border mb-3" style="max-width:400px;">
+        <div class="mb-3">
+          <label class="form-label">Gün Sayısı</label>
+          <input type="number" class="form-control" formControlName="gunSayisi" placeholder="Varsayılan: 40">
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-info flex-fill" [disabled]="bosFasonForm.invalid || bosFasonLoading">Listele</button>
+          <button type="button" class="btn btn-success flex-fill" [disabled]="!bosFasonList.length" (click)="exportBosFasonToExcel()">Excel</button>
+        </div>
+      </form>
+      <div *ngIf="bosFasonLoading" class="mt-3 text-info">İşlem yapılıyor...</div>
+      <div *ngIf="bosFasonError" class="mt-3 alert alert-danger">{{bosFasonError}}</div>
+      <div *ngIf="bosFasonList && bosFasonList.length" class="mt-3">
+        <h6>Sonuçlar:</h6>
+        <table class="table table-bordered table-sm">
+          <thead>
+            <tr>
+              <th *ngFor="let key of bosFasonKeys">{{key}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of bosFasonList">
+              <td *ngFor="let key of bosFasonKeys">{{item[key]}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <fieldset class="border rounded p-3 mb-4">
+    <legend class="float-none w-auto px-2">Lot Ekleme</legend>
+    <div *ngIf="activeTab==='lot'">
+      <h5 class="mb-3">Fason Mutabakat Formu</h5>
+      <form [formGroup]="mutabakForm" (ngSubmit)="submit()" class="bg-white p-4 rounded shadow-sm border">
+        <!-- ...form fields (unchanged)... -->
+        <div class="mb-3">
+          <label class="form-label">Ürün Kodu</label>
+          <input class="form-control" formControlName="UrunKodu" placeholder="Ürün kodu giriniz">
+          <div *ngIf="mutabakForm.get('UrunKodu')?.invalid && mutabakForm.get('UrunKodu')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Yarı Mamül Kodu</label>
+          <input class="form-control" formControlName="YariMamülKodu" placeholder="Yukarıdaki Ürün Kodu ile aynı olacak">
+          <div *ngIf="mutabakForm.get('YariMamülKodu')?.invalid && mutabakForm.get('YariMamülKodu')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <div class="row">
+          <div class="col mb-3">
+            <label class="form-label">Planlanan Miktar</label>
+            <input class="form-control" formControlName="PlanlananMiktar" placeholder="Miktar">
+            <div *ngIf="mutabakForm.get('PlanlananMiktar')?.invalid && mutabakForm.get('PlanlananMiktar')?.touched" class="text-danger small">Sayı giriniz</div>
+          </div>
+          <div class="col mb-3">
+            <label class="form-label">Koli Adeti</label>
+            <input class="form-control" formControlName="KoliAdeti" placeholder="Koli adeti">
+            <div *ngIf="mutabakForm.get('KoliAdeti')?.invalid && mutabakForm.get('KoliAdeti')?.touched" class="text-danger small">Sayı giriniz</div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Fason İş</label>
+          <select class="form-select" formControlName="Fasonis" style="color: #000;">
+            <option value="" disabled selected>Fason iş seçiniz</option>
+            <option *ngFor="let is of fasonIsler" [value]="is.IslemAdi">{{ is.IslemAdi }}</option>
+          </select>
+          <div *ngIf="fasonIslerLoading" class="text-info small">Yükleniyor...</div>
+          <div *ngIf="fasonIslerError" class="text-danger small">{{ fasonIslerError }}</div>
+          <div *ngIf="mutabakForm.get('Fasonis')?.invalid && mutabakForm.get('Fasonis')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Fason Şirket</label>
+          <select class="form-select" formControlName="Fasomsirket">
+            <option value="" disabled selected>Fason şirket seçiniz</option>
+            <option *ngFor="let f of fasonFirmalar" [value]="f">{{ f }}</option>
+          </select>
+          <div *ngIf="fasonFirmalarLoading" class="text-info small">Yükleniyor...</div>
+          <div *ngIf="fasonFirmalarError" class="text-danger small">{{ fasonFirmalarError }}</div>
+          <div *ngIf="mutabakForm.get('Fasomsirket')?.invalid && mutabakForm.get('Fasomsirket')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Oluşturan Kullanıcı</label>
+          <input class="form-control" formControlName="CreateUser" placeholder="Kullanıcı adı">
+          <div *ngIf="mutabakForm.get('CreateUser')?.invalid && mutabakForm.get('CreateUser')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <button class="btn btn-primary w-100" [disabled]="mutabakForm.invalid || loading">Gönder</button>
+      </form>
+      <div *ngIf="loading" class="mt-3 text-info">İşlem yapılıyor...</div>
+      <div *ngIf="error" class="mt-3 alert alert-danger">{{error}}</div>
+      <div *ngIf="result" class="mt-3 alert alert-success">
+        <b>Başarılı!</b> Sonuç: <pre>{{result | json}}</pre>
+      </div>
+    </div>
+    <!-- Diğer tablar için formlar buraya eklenecek -->
+    <div *ngIf="activeTab==='surec'">
+      <h5 class="mb-3">Süreç Değiştir</h5>
+      <form [formGroup]="surecDegistirForm" (ngSubmit)="submitSurecDegistir()" class="bg-white p-4 rounded shadow-sm border">
+        <div class="mb-3">
+          <label class="form-label">Lot Numarası</label>
+          <input class="form-control" formControlName="LotNumarasi" placeholder="Lot numarası giriniz">
+          <div *ngIf="surecDegistirForm.get('LotNumarasi')?.invalid && surecDegistirForm.get('LotNumarasi')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">İsim</label>
+          <select class="form-select" formControlName="isim">
+            <option value="" disabled selected>Fason şirket seçiniz</option>
+            <option *ngFor="let f of fasonFirmalar" [value]="f">{{ f }}</option>
+          </select>
+          <div *ngIf="fasonFirmalarLoading" class="text-info small">Yükleniyor...</div>
+          <div *ngIf="fasonFirmalarError" class="text-danger small">{{ fasonFirmalarError }}</div>
+          <div *ngIf="surecDegistirForm.get('isim')?.invalid && surecDegistirForm.get('isim')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Süreç</label>
+          <select class="form-select" formControlName="Surec">
+            <option value="" disabled selected>Süreç seçiniz</option>
+            <option value="ARACAYUKLE">ARACAYUKLE</option>
+            <option value="FASONATESLIMET">FASONATESLIMET</option>
+            <option value="FASONDANTESLIMAL">FASONDANTESLIMAL</option>
+            <option value="FASONKABUL">FASONKABUL</option>
+          </select>
+          <div *ngIf="surecDegistirForm.get('Surec')?.invalid && surecDegistirForm.get('Surec')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Yükleme Tarihi</label>
+          <input type="date" class="form-control" formControlName="YuklemeTarihi">
+          <div *ngIf="surecDegistirForm.get('YuklemeTarihi')?.invalid && surecDegistirForm.get('YuklemeTarihi')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <button class="btn btn-primary w-100" [disabled]="surecDegistirForm.invalid || surecDegistirLoading">Gönder</button>
+      </form>
+      <div *ngIf="surecDegistirLoading" class="mt-3 text-info">İşlem yapılıyor...</div>
+      <div *ngIf="surecDegistirError" class="mt-3 alert alert-danger">{{surecDegistirError}}</div>
+      <div *ngIf="surecDegistirResult" class="mt-3 alert alert-success">
+        <b>Başarılı!</b> Sonuç: <pre>{{surecDegistirResult | json}}</pre>
+      </div>
+    </div>
+    <div *ngIf="activeTab==='sil'">
+      <h5 class="mb-3">Lot Sil</h5>
+      <form [formGroup]="lotSilForm" (ngSubmit)="submitLotSil()" class="bg-white p-4 rounded shadow-sm border">
+        <div class="mb-3">
+          <label class="form-label">Lot Numarası</label>
+          <input class="form-control" formControlName="LotNumarasi" placeholder="Lot numarası giriniz">
+          <div *ngIf="lotSilForm.get('LotNumarasi')?.invalid && lotSilForm.get('LotNumarasi')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <button class="btn btn-danger w-100" [disabled]="lotSilForm.invalid || lotSilLoading">Sil</button>
+      </form>
+      <div *ngIf="lotSilLoading" class="mt-3 text-info">İşlem yapılıyor...</div>
+      <div *ngIf="lotSilError" class="mt-3 alert alert-danger">{{lotSilError}}</div>
+      <div *ngIf="lotSilResult" class="mt-3 alert alert-success">
+        <b>Başarılı!</b> Sonuç: <pre>{{lotSilResult | json}}</pre>
+      </div>
+    </div>
+    <div *ngIf="activeTab==='tarih'">
+      <h5 class="mb-3">Lotun Tarihini Değiştir</h5>
+      <form [formGroup]="lotTarihiDegistirForm" (ngSubmit)="submitLotTarihiDegistir()" class="bg-white p-4 rounded shadow-sm border">
+        <div class="mb-3">
+          <label class="form-label">Lot Numarası</label>
+          <input class="form-control" formControlName="LotNumarasi" placeholder="Lot numarası giriniz">
+          <div *ngIf="lotTarihiDegistirForm.get('LotNumarasi')?.invalid && lotTarihiDegistirForm.get('LotNumarasi')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Yeni Yükleme Tarihi</label>
+          <input type="date" class="form-control" formControlName="YeniYuklemeTarihi">
+          <div *ngIf="lotTarihiDegistirForm.get('YeniYuklemeTarihi')?.invalid && lotTarihiDegistirForm.get('YeniYuklemeTarihi')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Kullanıcı</label>
+          <input class="form-control" formControlName="CreateUser" placeholder="Kullanıcı adı">
+          <div *ngIf="lotTarihiDegistirForm.get('CreateUser')?.invalid && lotTarihiDegistirForm.get('CreateUser')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" formControlName="DeleteEmptyHeader" id="deleteEmptyHeader">
+          <label class="form-check-label" for="deleteEmptyHeader">Boş header'ı sil</label>
+        </div>
+        <button class="btn btn-warning w-100" [disabled]="lotTarihiDegistirForm.invalid || lotTarihiDegistirLoading">Tarihi Değiştir</button>
+      </form>
+      <div *ngIf="lotTarihiDegistirLoading" class="mt-3 text-info">İşlem yapılıyor...</div>
+      <div *ngIf="lotTarihiDegistirError" class="mt-3 alert alert-danger">{{lotTarihiDegistirError}}</div>
+      <div *ngIf="lotTarihiDegistirResult" class="mt-3 alert alert-success">
+        <b>Başarılı!</b> Sonuç: <pre>{{lotTarihiDegistirResult | json}}</pre>
+      </div>
+    </div>
+    <div *ngIf="activeTab==='miktar'">
+      <h5 class="mb-3">Lot Miktarı Güncelle</h5>
+      <form [formGroup]="lotMiktariGuncelleForm" (ngSubmit)="submitLotMiktariGuncelle()" class="bg-white p-4 rounded shadow-sm border">
+        <div class="mb-3">
+          <label class="form-label">Lot Numarası</label>
+          <input class="form-control" formControlName="LotNumarasi" placeholder="Lot numarası giriniz">
+          <div *ngIf="lotMiktariGuncelleForm.get('LotNumarasi')?.invalid && lotMiktariGuncelleForm.get('LotNumarasi')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Yeni Üretilen Miktar</label>
+          <input class="form-control" formControlName="YeniUretilenMiktar" placeholder="Yeni miktar">
+          <div *ngIf="lotMiktariGuncelleForm.get('YeniUretilenMiktar')?.invalid && lotMiktariGuncelleForm.get('YeniUretilenMiktar')?.touched" class="text-danger small">Sayı giriniz</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Kullanıcı</label>
+          <input class="form-control" formControlName="UpdateUser" placeholder="Kullanıcı adı">
+          <div *ngIf="lotMiktariGuncelleForm.get('UpdateUser')?.invalid && lotMiktariGuncelleForm.get('UpdateUser')?.touched" class="text-danger small">Zorunlu alan</div>
+        </div>
+        <button class="btn btn-success w-100" [disabled]="lotMiktariGuncelleForm.invalid || lotMiktariGuncelleLoading">Miktarı Güncelle</button>
+      </form>
+      <div *ngIf="lotMiktariGuncelleLoading" class="mt-3 text-info">İşlem yapılıyor...</div>
+      <div *ngIf="lotMiktariGuncelleError" class="mt-3 alert alert-danger">{{lotMiktariGuncelleError}}</div>
+      <div *ngIf="lotMiktariGuncelleResult" class="mt-3 alert alert-success">
+        <b>Başarılı!</b> Sonuç: <pre>{{lotMiktariGuncelleResult | json}}</pre>
+      </div>
+    </div>
+  </fieldset>
+</div>

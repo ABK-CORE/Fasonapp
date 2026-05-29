@@ -1,0 +1,164 @@
+<h3 class="mb-3">Fason İşlem</h3>
+<form class="row g-2 mb-3">
+  <div class="col-auto">
+    <label class="form-label">Firma Adı</label>
+    <input class="form-control" [(ngModel)]="form.firmaAdi" name="firmaAdi">
+  </div>
+  <div class="col-auto">
+    <label class="form-label">Stok Kodu</label>
+    <input class="form-control" [(ngModel)]="form.stokKodu" name="stokKodu">
+  </div>
+  <div class="col-auto">
+    <label class="form-label">Stok Adı</label>
+    <input class="form-control" [(ngModel)]="form.stokAdi" name="stokAdi">
+    <button type="button" class="btn btn-success btn-sm mt-1" (click)="ara()">Ara</button>
+      <ng-container *ngIf="showFasonCombo">
+        <label class="ms-3 mb-0">Fason İsim:</label>
+        <select class="form-select form-select-sm w-auto ms-2" [(ngModel)]="selectedFason" (change)="onFasonChange()">
+          <option value="">Tümü</option>
+          <option *ngFor="let f of fasonFirmalar" [value]="f">{{ f }}</option>
+        </select>
+      </ng-container>
+  </div>
+  <div class="col-auto">
+    <label class="form-label">Koli içi Adet</label>
+    <input class="form-control" type="number" [(ngModel)]="form.koliIciAdet" name="koliIciAdet">
+  </div>
+  <div class="col-auto">
+    <label class="form-label">Fason İşi</label>
+    <select class="form-select" [(ngModel)]="form.fasonIsi" name="fasonIsi">
+      <option *ngFor="let f of fasonIsleri" [value]="f">{{ f }}</option>
+    </select>
+  </div>
+  <div class="col-auto">
+    <label class="form-label">Kaç Koli</label>
+    <input class="form-control" type="number" [(ngModel)]="form.kacKoli" name="kacKoli">
+  </div>
+  <div class="col-auto">
+    <label class="form-label">Tarih</label>
+    <input class="form-control" type="date" [(ngModel)]="form.tarih" name="tarih">
+  </div>
+  <div class="col-auto align-self-end">
+    <button type="button" class="btn btn-primary me-2" (click)="listele()">Listele</button>
+    <button type="button" class="btn btn-success" (click)="ekle()">Ekle</button>
+  </div>
+</form>
+
+<div class="table-responsive">
+  <table class="table table-sm table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>ÜretimEmriNo</th>
+        <th>ÜretimTipi</th>
+        <th>ÜretilecekÜrün</th>
+        <th>StokAdı</th>
+        <th>KoliİçiAdet</th>
+        <th>Fasonİş</th>
+        <th>FasonFirmaadı</th>
+        <th>LotNumarası</th>
+        <th>Etiketsayısı</th>
+        <th>Barkodyazdı</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of rows">
+        <td>{{ r.UretimEmriNo }}</td>
+        <td>{{ r.UretimTipi }}</td>
+        <td>{{ r.UretilecekUrun }}</td>
+        <td>{{ r.StokAdi }}</td>
+        <td>{{ r.KoliciAdeti }}</td>
+        <td>{{ r.Fasonis }}</td>
+        <td>{{ r.FasonFirmaadi }}</td>
+        <td>{{ r.LotNumarasi }}</td>
+        <td>{{ r.Etiketsayisi }}</td>
+
+        <td>
+          <button *ngIf="!r.Barkodyazdi" class="btn btn-outline-secondary btn-sm" (click)="barkodYaz(r)">Barkodyaz</button>
+          <span *ngIf="r.Barkodyazdi" class="badge bg-success">Yazıldı</span>
+        </td>
+      </tr>
+      <tr *ngIf="!rows.length && !busy">
+        <td colspan="10" class="text-center text-muted">Kayıt yok</td>
+      </tr>
+    </tbody>
+  </table>
+
+<!-- Barkod Yaz Modal -->
+<div class="modal fade show" tabindex="-1" [ngStyle]="{'display': showBarkodModal ? 'block' : 'none', 'background': 'rgba(0,0,0,0.3)'}" *ngIf="showBarkodModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Barkod Yazdır</h5>
+        <button type="button" class="btn-close" (click)="kapatBarkodModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="barkodData">
+          <div class="mb-2">
+            <label>Yazıcı Seçimi:</label>
+            <select class="form-select" [(ngModel)]="seciliYazici" *ngIf="yazicilar.length > 0">
+              <option *ngFor="let y of yazicilar" [value]="y">{{y}}</option>
+            </select>
+            <input *ngIf="yazicilar.length === 0" class="form-control" [(ngModel)]="seciliYazici" placeholder="Yazıcı adı giriniz">
+          </div>
+          <div id="etiketPrintArea" class="etiket border p-2">
+            <div><b>FASON FİRMA:</b> {{barkodData.firmaadi}}</div>
+            <div><b>ÜRÜN KODU:</b> {{barkodData.stokKodu}}</div>
+            <div><b>ÜRÜN ADI:</b> {{barkodData.stokAdi}}</div>
+            <div><b>Lot Numarası:</b> {{barkodData.lotNumarasi}}</div>
+            <div><b>KOLİ İÇİADET:</b> {{barkodData.miktar}} {{barkodData.birim}}</div>
+            <div><b>YAPILAN İŞLEM:</b> {{barkodData.fasonis}}</div>
+            <div><b>Etiket Sayısı:</b> {{barkodData.etiketSayisi}}</div>
+            <div class="my-2 text-center">
+              <!-- Barkod veya QR kodu için canvas -->
+              <canvas id="etiketQrCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="kapatBarkodModal()">Kapat</button>
+        <button type="button" class="btn btn-primary" (click)="yazdirEtiket()">Yazdır</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Fazla/tekrarlı tablo ve satırları kaldırıldı. -->
+</div>
+
+<!-- Ürün Arama Modalı -->
+<div class="modal-backdrop fade show" *ngIf="showUrunModal" style="z-index:1040"></div>
+<div class="modal fade show d-block" tabindex="-1" *ngIf="showUrunModal" style="background:rgba(0,0,0,0.2);z-index:1050">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Ürün Seç</h5>
+        <button type="button" class="btn-close" (click)="kapatUrunModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="urunlerBusy" class="text-center text-muted">Yükleniyor...</div>
+        <table *ngIf="!urunlerBusy" class="table table-sm table-hover">
+          <thead>
+            <tr>
+              <th>Stok Kodu</th>
+              <th>Fason Ürün İsmi</th>
+              <th>Tür</th>
+              <tbody>
+                <tr *ngFor="let r of rows">
+                  <td>{{ r.UretimEmriNo }}</td>
+                  <td>{{ r.UretimTipi }}</td>
+                  <td>{{ r.UretilecekUrun }}</td>
+                  <td>{{ r.StokAdi }}</td>
+                  <td>{{ r.KoliciAdeti }}</td>
+                  <td>{{ r.Fasonis }}</td>
+                  <td>{{ r.FasonFirmaadi }}</td>
+                  <td>{{ r.LotNumarasi }}</td>
+                  <td>{{ r.Etiketsayisi }}</td>
+                  <td>
+                    <button *ngIf="!r.Barkodyazdi" class="btn btn-outline-secondary btn-sm" (click)="barkodYaz(r)">Barkodyaz</button>
+                    <span *ngIf="r.Barkodyazdi" class="badge bg-success">Yazıldı</span>
+                  </td>
+                </tr>
+                <tr *ngIf="rows.length === 0 && !busy">
+                  <td colspan="10" class="text-center text-muted">Kayıt yok</td>
+                </tr>
+              </tbody>

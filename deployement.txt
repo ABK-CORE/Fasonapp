@@ -1,0 +1,286 @@
+S C:\Users\Administrator> $Domain = "fasonback.abkcore.com"
+\\10.41.17.2\c$\inetpub\wwwroot\fasonback
+PS C:\Users\Administrator> $BaseUrl = "https://$Domain"
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 1) DNS Kayıtları ===" -ForegroundColor Cyan
+
+=== 1) DNS Kayıtları ===
+PS C:\Users\Administrator> Resolve-DnsName $Domain -ErrorAction SilentlyContinue
+
+Name                                           Type   TTL   Section    IPAddress
+----                                           ----   ---   -------    ---------
+fasonback.abkcore.com                          A      3586  Answer     185.82.220.135
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 2) A Kaydı / IP Bilgisi ===" -ForegroundColor Cyan
+
+=== 2) A Kaydı / IP Bilgisi ===
+PS C:\Users\Administrator> $ipRecords = Resolve-DnsName $Domain -Type A -ErrorAction SilentlyContinue
+PS C:\Users\Administrator> $ipRecords | Select-Object Name, Type, IPAddress
+
+Name                  Type IPAddress
+----                  ---- ---------
+fasonback.abkcore.com    A 185.82.220.135
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 3) CNAME Kontrolü ===" -ForegroundColor Cyan
+
+=== 3) CNAME Kontrolü ===
+PS C:\Users\Administrator> Resolve-DnsName $Domain -Type CNAME -ErrorAction SilentlyContinue
+
+Name                        Type TTL   Section    PrimaryServer               NameAdministrator           SerialNumber
+----                        ---- ---   -------    -------------               -----------------           ------------
+abkcore.com                 SOA  1800  Authority  ns12.wixdns.net             support.wix.com             2025073118
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 4) HTTPS Erişim Testi ===" -ForegroundColor Cyan
+
+=== 4) HTTPS Erişim Testi ===
+PS C:\Users\Administrator> Test-NetConnection $Domain -Port 443
+
+
+ComputerName     : fasonback.abkcore.com
+RemoteAddress    : 185.82.220.135
+RemotePort       : 443
+InterfaceAlias   : Ethernet0
+SourceAddress    : 10.41.17.2
+TcpTestSucceeded : True
+
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 5) HTTP Erişim Testi ===" -ForegroundColor Cyan
+
+=== 5) HTTP Erişim Testi ===
+PS C:\Users\Administrator> Test-NetConnection $Domain -Port 80
+
+
+ComputerName     : fasonback.abkcore.com
+RemoteAddress    : 185.82.220.135
+RemotePort       : 80
+InterfaceAlias   : Ethernet0
+SourceAddress    : 10.41.17.2
+TcpTestSucceeded : True
+
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 6) HTTP Header Bilgileri ===" -ForegroundColor Cyan
+
+=== 6) HTTP Header Bilgileri ===
+PS C:\Users\Administrator> try {
+>>     $response = Invoke-WebRequest -Uri $BaseUrl -Method Head -UseBasicParsing -TimeoutSec 15
+>>     $response.Headers
+>>     Write-Host "Status Code:" $response.StatusCode
+>> }
+>> catch {
+>>     Write-Host "Header alınamadı:" $_.Exception.Message -ForegroundColor Yellow
+>> }
+Header alınamadı: The remote server returned an error: (404) Not Found.
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 7) SSL Sertifika Bilgisi ===" -ForegroundColor Cyan
+
+=== 7) SSL Sertifika Bilgisi ===
+PS C:\Users\Administrator> try {
+>>     $tcp = New-Object Net.Sockets.TcpClient($Domain, 443)
+>>     $ssl = New-Object Net.Security.SslStream($tcp.GetStream(), $false, ({ $true }))
+>>     $ssl.AuthenticateAsClient($Domain)
+>>
+>>     $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($ssl.RemoteCertificate)
+>>
+>>     [PSCustomObject]@{
+>>         Subject    = $cert.Subject
+>>         Issuer     = $cert.Issuer
+>>         NotBefore  = $cert.NotBefore
+>>         NotAfter   = $cert.NotAfter
+>>         Thumbprint = $cert.Thumbprint
+>>     }
+>>
+>>     $ssl.Close()
+>>     $tcp.Close()
+>> }
+>> catch {
+>>     Write-Host "SSL bilgisi alınamadı:" $_.Exception.Message -ForegroundColor Yellow
+>> }
+
+
+Subject    : CN=*.abkcore.com
+Issuer     : CN=TrustSafe TLS RSA SubCA R1, O=Isimtescil Bilisim A.S., C=TR
+NotBefore  : 28.05.2025 12:54:09
+NotAfter   : 27.05.2026 12:54:09
+Thumbprint : F626D86BAAE8ADF103EA39C21B6D308F261FA4A4
+
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 8) Sayfa Başlığı / Basit çerik Kontrolü ===" -ForegroundColor Cyan
+
+=== 8) Sayfa Başlığı / Basit çerik Kontrolü ===
+PS C:\Users\Administrator> try {
+>>     $page = Invoke-WebRequest -Uri $BaseUrl -UseBasicParsing -TimeoutSec 20
+>>     $page.StatusCode
+>>     $page.ParsedHtml.title
+>> }
+>> catch {
+>>     Write-Host "Sayfa içeriği alınamadı:" $_.Exception.Message -ForegroundColor Yellow
+>> }
+Sayfa içeriği alınamadı: The remote server returned an error: (404) Not Found.
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== Kontrol Tamamlandı ===" -ForegroundColor Green
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> $Domain = "fason.abkcore.com"
+C:\inetpub\wwwroot\fason
+PS C:\Users\Administrator> $BaseUrl = "https://$Domain"
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 1) DNS Kayıtları ===" -ForegroundColor Cyan
+
+=== 1) DNS Kayıtları ===
+PS C:\Users\Administrator> Resolve-DnsName $Domain -ErrorAction SilentlyContinue
+
+Name                                           Type   TTL   Section    IPAddress
+----                                           ----   ---   -------    ---------
+fason.abkcore.com                              A      3321  Answer     185.82.220.135
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 2) A Kaydı / IP Bilgisi ===" -ForegroundColor Cyan
+
+=== 2) A Kaydı / IP Bilgisi ===
+PS C:\Users\Administrator> $ipRecords = Resolve-DnsName $Domain -Type A -ErrorAction SilentlyContinue
+PS C:\Users\Administrator> $ipRecords | Select-Object Name, Type, IPAddress
+
+Name              Type IPAddress
+----              ---- ---------
+fason.abkcore.com    A 185.82.220.135
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 3) CNAME Kontrolü ===" -ForegroundColor Cyan
+
+=== 3) CNAME Kontrolü ===
+PS C:\Users\Administrator> Resolve-DnsName $Domain -Type CNAME -ErrorAction SilentlyContinue
+
+Name                        Type TTL   Section    PrimaryServer               NameAdministrator           SerialNumber
+----                        ---- ---   -------    -------------               -----------------           ------------
+abkcore.com                 SOA  1518  Authority  ns12.wixdns.net             support.wix.com             2025073118
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 4) HTTPS Erişim Testi ===" -ForegroundColor Cyan
+
+=== 4) HTTPS Erişim Testi ===
+PS C:\Users\Administrator> Test-NetConnection $Domain -Port 443
+
+
+ComputerName     : fason.abkcore.com
+RemoteAddress    : 185.82.220.135
+RemotePort       : 443
+InterfaceAlias   : Ethernet0
+SourceAddress    : 10.41.17.2
+TcpTestSucceeded : True
+
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 5) HTTP Erişim Testi ===" -ForegroundColor Cyan
+
+=== 5) HTTP Erişim Testi ===
+PS C:\Users\Administrator> Test-NetConnection $Domain -Port 80
+
+
+ComputerName     : fason.abkcore.com
+RemoteAddress    : 185.82.220.135
+RemotePort       : 80
+InterfaceAlias   : Ethernet0
+SourceAddress    : 10.41.17.2
+TcpTestSucceeded : True
+
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 6) HTTP Header Bilgileri ===" -ForegroundColor Cyan
+
+=== 6) HTTP Header Bilgileri ===
+PS C:\Users\Administrator> try {
+>>     $response = Invoke-WebRequest -Uri $BaseUrl -Method Head -UseBasicParsing -TimeoutSec 15
+>>     $response.Headers
+>>     Write-Host "Status Code:" $response.StatusCode
+>> }
+>> catch {
+>>     Write-Host "Header alınamadı:" $_.Exception.Message -ForegroundColor Yellow
+>> }
+
+Status Code: 200
+Key            Value
+---            -----
+Accept-Ranges  bytes
+Content-Length 5303
+Content-Type   text/html
+Date           Mon, 04 May 2026 17:18:16 GMT
+ETag           "06fd226a8cdc1:0"
+Last-Modified  Fri, 23 Jan 2026 13:13:58 GMT
+Server         Microsoft-IIS/10.0
+X-Powered-By   ASP.NET
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 7) SSL Sertifika Bilgisi ===" -ForegroundColor Cyan
+
+=== 7) SSL Sertifika Bilgisi ===
+PS C:\Users\Administrator> try {
+>>     $tcp = New-Object Net.Sockets.TcpClient($Domain, 443)
+>>     $ssl = New-Object Net.Security.SslStream($tcp.GetStream(), $false, ({ $true }))
+>>     $ssl.AuthenticateAsClient($Domain)
+>>
+>>     $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($ssl.RemoteCertificate)
+>>
+>>     [PSCustomObject]@{
+>>         Subject    = $cert.Subject
+>>         Issuer     = $cert.Issuer
+>>         NotBefore  = $cert.NotBefore
+>>         NotAfter   = $cert.NotAfter
+>>         Thumbprint = $cert.Thumbprint
+>>     }
+>>
+>>     $ssl.Close()
+>>     $tcp.Close()
+>> }
+>> catch {
+>>     Write-Host "SSL bilgisi alınamadı:" $_.Exception.Message -ForegroundColor Yellow
+>> }
+
+
+Subject    : CN=*.abkcore.com
+Issuer     : CN=TrustSafe TLS RSA SubCA R1, O=Isimtescil Bilisim A.S., C=TR
+NotBefore  : 28.05.2025 12:54:09
+NotAfter   : 27.05.2026 12:54:09
+Thumbprint : F626D86BAAE8ADF103EA39C21B6D308F261FA4A4
+
+
+
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== 8) Sayfa Başlığı / Basit çerik Kontrolü ===" -ForegroundColor Cyan
+
+=== 8) Sayfa Başlığı / Basit çerik Kontrolü ===
+PS C:\Users\Administrator> try {
+>>     $page = Invoke-WebRequest -Uri $BaseUrl -UseBasicParsing -TimeoutSec 20
+>>     $page.StatusCode
+>>     $page.ParsedHtml.title
+>> }
+>> catch {
+>>     Write-Host "Sayfa içeriği alınamadı:" $_.Exception.Message -ForegroundColor Yellow
+>> }
+200
+PS C:\Users\Administrator>
+PS C:\Users\Administrator> Write-Host "`n=== Kontrol Tamamlandı ===" -ForegroundColor Green
+
+
+
+
+
+
+

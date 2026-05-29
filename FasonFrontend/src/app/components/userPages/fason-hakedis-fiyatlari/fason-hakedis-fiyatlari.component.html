@@ -1,0 +1,71 @@
+<div class="p-2" style="background:#e3f6fd">
+  <div class="mb-2 fw-bold">Fason Hakediş Fiyatları
+    <ng-container *ngIf="showControls">
+      <label class="ms-3 mb-0">Fason İsim:</label>
+      <button class="btn btn-outline-primary btn-sm ms-2" (click)="openFasonModal()">Fason Ara</button>
+      <span class="ms-2 fw-semibold" *ngIf="selectedFason">{{ selectedFason }}</span>
+      <span class="ms-2 text-muted" *ngIf="!selectedFason">Secim yapilmadi</span>
+      <label class="ms-3 mb-0">Başlangıç:</label>
+      <input class="form-control form-control-sm w-auto d-inline-block ms-2" type="date" [(ngModel)]="baslangicTarihi">
+      <label class="ms-3 mb-0">Bitiş:</label>
+      <input class="form-control form-control-sm w-auto d-inline-block ms-2" type="date" [(ngModel)]="bitisTarihi">
+      <button class="btn btn-primary btn-sm ms-2" (click)="goster()">Göster</button>
+      <button class="btn btn-success btn-sm ms-2" (click)="excelExport()">Excel</button>
+    </ng-container>
+  </div>
+  <table *ngIf="fiyatData.length > 0" class="table table-bordered table-sm mt-3">
+    <thead>
+      <tr>
+        <th *ngFor="let h of fiyatData[0] | keyvalue">{{h.key}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of fiyatData">
+        <td *ngFor="let h of row | keyvalue">
+          <ng-container *ngIf="h.key === 'FIYAT'; else normalCell">
+            {{ h.value | number:'1.2-2' }}
+          </ng-container>
+          <ng-template #normalCell>{{h.value}}</ng-template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="showFasonModal" style="z-index:1040"></div>
+<div class="modal fade show d-block" tabindex="-1" *ngIf="showFasonModal" style="background:rgba(0,0,0,0.2);z-index:1050">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Fason Firma Sec</h5>
+        <button type="button" class="btn-close" (click)="closeFasonModal()"></button>
+      </div>
+      <div class="modal-body">
+        <input class="form-control mb-3" placeholder="Fason firma ara..." [(ngModel)]="fasonSearchTerm" />
+
+        <div *ngIf="filteredFasonFirmalar.length === 0" class="text-muted">Sonuc bulunamadi.</div>
+
+        <div class="table-responsive" *ngIf="filteredFasonFirmalar.length > 0">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Firma</th>
+                <th style="width:120px">Sec</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let f of filteredFasonFirmalar" [class.table-primary]="pendingSelectedFason === f">
+                <td>{{ f }}</td>
+                <td><button class="btn btn-outline-primary btn-sm" (click)="choosePendingFason(f)">Sec</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeFasonModal()">Kapat</button>
+        <button class="btn btn-primary" (click)="confirmFasonSelection()">Secimi Onayla</button>
+      </div>
+    </div>
+  </div>
+</div>

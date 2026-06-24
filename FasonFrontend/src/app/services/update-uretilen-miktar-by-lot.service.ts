@@ -13,6 +13,6 @@ export class UpdateUretilenMiktarByLotService {
   constructor(private http: HttpClient) {}
 
   updateUretilenMiktarByLotManuel(request: UpdateUretilenMiktarByLotRequest): Observable<any> {
-    return this.http.post<any>('https://fasonback.abkcore.com/api/Fason/UpdateUretilenMiktarByLotManuel', request);
+    return this.http.post<any>('https://fasonback.norax.ai/api/Fason/UpdateUretilenMiktarByLotManuel', request);
   }
 }

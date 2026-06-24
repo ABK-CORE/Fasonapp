@@ -26,7 +26,7 @@ export class FasonHakedisFasonComponent {
   }
 
   goster() {
-    const url = `https://fasonback.abkcore.com/api/Fason/GetFasonDashboardYTDateMiktarliFason?fasonisim=${encodeURIComponent(this.selectedFason)}`;
+    const url = `https://fasonback.norax.ai/api/Fason/GetFasonDashboardYTDateMiktarliFason?fasonisim=${encodeURIComponent(this.selectedFason)}`;
     this.http.get<any[]>(url).subscribe(data => {
       this.dashboardData = data;
     }, err => {

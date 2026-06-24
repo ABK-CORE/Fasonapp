@@ -8,7 +8,7 @@ export class DeleteLotService {
 
   deleteLotByLotNumarasiManuel(lotNumarasi: string): Observable<any> {
     const request = { LotNumarasi: lotNumarasi };
-    return this.http.post<any>('https://fasonback.abkcore.com/api/Fason/DeleteLotByLotNumarasiManuel', request, {
+    return this.http.post<any>('https://fasonback.norax.ai/api/Fason/DeleteLotByLotNumarasiManuel', request, {
       headers: { 'Content-Type': 'application/json' }
     });
   }

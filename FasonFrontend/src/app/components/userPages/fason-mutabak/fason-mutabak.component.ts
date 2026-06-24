@@ -84,7 +84,7 @@ export class FasonMutabakComponent implements OnInit {
     this.bosFasonError = '';
     this.bosFasonList = [];
     const gunSayisi = this.bosFasonForm.value.gunSayisi;
-    this.http.get<any[]>(`https://fasonback.abkcore.com/api/Fason/GetBosFasonHakedis?gunSayisi=${gunSayisi}`).subscribe({
+    this.http.get<any[]>(`https://fasonback.norax.ai/api/Fason/GetBosFasonHakedis?gunSayisi=${gunSayisi}`).subscribe({
       next: (res) => {
         this.bosFasonList = res;
         this.bosFasonKeys = res && res.length ? Object.keys(res[0]) : [];
@@ -148,7 +148,7 @@ export class FasonMutabakComponent implements OnInit {
     this.loading = true;
     this.error = '';
     this.result = null;
-    this.http.post<any>('https://fasonback.abkcore.com/api/Fason/CreateUretimEmriVeLotMutabak', this.mutabakForm.value)
+    this.http.post<any>('https://fasonback.norax.ai/api/Fason/CreateUretimEmriVeLotMutabak', this.mutabakForm.value)
       .subscribe({
         next: (res) => {
           this.result = res;

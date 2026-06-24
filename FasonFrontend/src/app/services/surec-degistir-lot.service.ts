@@ -14,6 +14,6 @@ export class SurecDegistirLotService {
   constructor(private http: HttpClient) {}
 
   surecDegistirLot(request: SurecDegistirLotRequest): Observable<any> {
-    return this.http.post<any>('https://fasonback.abkcore.com/api/Fason/SurecDegistirLot', request);
+    return this.http.post<any>('https://fasonback.norax.ai/api/Fason/SurecDegistirLot', request);
   }
 }

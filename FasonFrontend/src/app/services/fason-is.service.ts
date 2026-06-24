@@ -7,6 +7,6 @@ export class FasonIsService {
   constructor(private http: HttpClient) {}
 
   getFasonIsler(): Observable<any[]> {
-    return this.http.get<any[]>('https://fasonback.abkcore.com/api/Fason/GetFasonIsler');
+    return this.http.get<any[]>('https://fasonback.norax.ai/api/Fason/GetFasonIsler');
   }
 }

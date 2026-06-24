@@ -14,6 +14,6 @@ export class ReassignLotToNewFasonYuklemeService {
   constructor(private http: HttpClient) {}
 
   reassignLotToNewFasonYukleme(request: ReassignLotToNewFasonYuklemeRequest): Observable<any> {
-    return this.http.post<any>('https://fasonback.abkcore.com/api/Fason/ReassignLotToNewFasonYukleme', request);
+    return this.http.post<any>('https://fasonback.norax.ai/api/Fason/ReassignLotToNewFasonYukleme', request);
   }
 }

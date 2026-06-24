@@ -43,7 +43,7 @@ export class FasonHakedisFasonFiyatliComponent {
   }
 
   goster() {
-    const url = `https://fasonback.abkcore.com/api/Fason/GetFasonDashboardYTDateMiktarliFasonFiyatli?fasonisim=${encodeURIComponent(this.selectedFason)}`;
+    const url = `https://fasonback.norax.ai/api/Fason/GetFasonDashboardYTDateMiktarliFasonFiyatli?fasonisim=${encodeURIComponent(this.selectedFason)}`;
     this.http.get<any[]>(url).subscribe(data => {
       this.dashboardData = data;
       this.hesaplaToplamlar();
